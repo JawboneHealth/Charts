@@ -234,34 +234,14 @@ open class HorizontalBarChartRenderer: BarChartRenderer
         
         let buffer = _buffers[index]
         
-        let isSingleColor = dataSet.colors.count == 1
-        
-        if isSingleColor
-        {
-            context.setFillColor(dataSet.color(atIndex: 0).cgColor)
-        }
-        
         for j in stride(from: 0, to: buffer.rects.count, by: 1)
         {
             let barRect = buffer.rects[j]
             
-            if (!viewPortHandler.isInBoundsTop(barRect.origin.y + barRect.size.height))
-            {
-                break
-            }
-            
-            if (!viewPortHandler.isInBoundsBottom(barRect.origin.y))
-            {
-                continue
-            }
-            
-            if !isSingleColor
-            {
-                // Set the color for the currently drawn value. If the index is out of bounds, reuse colors.
-                context.setFillColor(dataSet.color(atIndex: j).cgColor)
-            }
-            
-            context.fill(barRect)
+			guard viewPortHandler.isInBoundsTop(barRect.origin.y + barRect.size.height) else { break }
+			guard viewPortHandler.isInBoundsBottom(barRect.origin.y) else { continue }
+			
+            drawBar(context: context, dataSet: dataSet, index: j, barRect: barRect)
             
             if drawBorder
             {
