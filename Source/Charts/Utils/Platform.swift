@@ -529,20 +529,17 @@ types are aliased to either their UI* implementation (on iOS) or their NS* imple
 		private func transformToCGPath() -> CGPath {
 			
 			// Create path
-			var path = CGMutablePath()
-			var points = UnsafeMutablePointer<NSPoint>.allocate(capacity: 3)
+			let path = CGMutablePath()
+			let points = UnsafeMutablePointer<NSPoint>.allocate(capacity: 3)
 			let numElements = self.elementCount
 			
 			if numElements > 0 {
-				
 				var didClosePath = true
 				
 				for index in 0..<numElements {
-					
 					let pathType = self.element(at: index, associatedPoints: points)
 					
 					switch pathType {
-						
 					case .moveToBezierPathElement:
 						path.move(to: CGPoint(x: points[0].x, y: points[0].y))
 					case .lineToBezierPathElement:
