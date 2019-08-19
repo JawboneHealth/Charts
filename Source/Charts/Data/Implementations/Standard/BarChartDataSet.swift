@@ -169,8 +169,9 @@ open class BarChartDataSet: BarLineScatterCandleBubbleChartDataSet, IBarChartDat
 	/// - returns: The gradient colors at the given index of the DataSet's gradient color array.
 	/// This prevents out-of-bounds by performing a modulus on the gradient color index, so colours will repeat themselves.
 	open func barGradientColor(at index: Int) -> [NSUIColor]? {
-		guard let gradientColors = barGradientColors else { return nil }
-		return gradientColors[index % gradientColors.count]
+        guard let gradientColors = barGradientColors, !gradientColors.isEmpty else { return nil }
+        
+        return gradientColors[index % gradientColors.count]
 	}
     
     // MARK: - NSCopying
