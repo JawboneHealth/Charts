@@ -12,6 +12,10 @@
 import Foundation
 import CoreGraphics
 
+@objc public enum BarGradientOrientation: Int {
+    case Vertical
+    case Horizontal
+}
 
 open class BarChartDataSet: BarLineScatterCandleBubbleChartDataSet, IBarChartDataSet
 {
@@ -145,9 +149,29 @@ open class BarChartDataSet: BarLineScatterCandleBubbleChartDataSet, IBarChartDat
 
     /// the color drawing borders around the bars.
     open var barBorderColor = NSUIColor.black
+    
+    #if !os(OSX)
+    /// the option rounding bar corners
+    open var barRoundingCorners: UIRectCorner = .allCorners
+    #endif
+    /// the radius when rounding bar corners
+    open var barCornerRadius: CGFloat = 0.0
 
     /// the alpha value (transparency) that is used for drawing the highlight indicator bar. min = 0.0 (fully transparent), max = 1.0 (fully opaque)
     open var highlightAlpha = CGFloat(120.0 / 255.0)
+    
+    /// array of gradient colors [[color1, color2], [color3, color4]]
+    open var barGradientColors: [[NSUIColor]]?
+
+    open var barGradientOrientation: BarGradientOrientation = .Vertical
+
+    /// - returns: The gradient colors at the given index of the DataSet's gradient color array.
+    /// This prevents out-of-bounds by performing a modulus on the gradient color index, so colours will repeat themselves.
+    open func barGradientColor(at index: Int) -> [NSUIColor]? {
+        guard let gradientColors = barGradientColors, !gradientColors.isEmpty else { return nil }
+
+        return gradientColors[index % gradientColors.count]
+    }
     
     // MARK: - NSCopying
     
