@@ -245,7 +245,7 @@ open class HorizontalBarChartRenderer: BarChartRenderer
             guard viewPortHandler.isInBoundsTop(barRect.origin.y + barRect.size.height) else { break }
             guard viewPortHandler.isInBoundsBottom(barRect.origin.y) else { continue }
 
-            drawBar(context: context, dataSet: dataSet, index: j, barRect: barRect)
+            drawBar(context: context, dataSet: dataSet as! BarChartDataSet, index: j, barRect: barRect)
 
             if drawBorder
             {
