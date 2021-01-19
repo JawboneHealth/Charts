@@ -707,6 +707,31 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
         }
     }
     
+    open func drawGradient(context: CGContext, barRect: CGRect, path: CGPath?, gradientColors: Array<NSUIColor>, orientation: BarGradientOrientation) {
+        let cgColors = gradientColors.map{ $0.cgColor } as CFArray
+        guard let gradient = CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(), colors: cgColors, locations: nil) else { return }
+
+        let startPoint: CGPoint
+        let endPoint: CGPoint
+
+        switch orientation
+        {
+        case .Vertical:
+            startPoint = CGPoint(x: barRect.midX, y: barRect.maxY)
+            endPoint = CGPoint(x: barRect.midX, y: barRect.minY)
+
+        case .Horizontal:
+            startPoint = CGPoint(x: barRect.minX, y: barRect.midY)
+            endPoint = CGPoint(x: barRect.maxX, y: barRect.midY)
+        }
+
+        let defaultPath = CGPath(rect: barRect, transform: nil)
+
+        context.addPath(path ?? defaultPath)
+        context.clip()
+        context.drawLinearGradient(gradient, start: startPoint, end: endPoint, options: [])
+    }
+    
     /// Draws a value at the specified x and y position.
     @objc open func drawValue(context: CGContext, value: String, xPos: CGFloat, yPos: CGFloat, font: NSUIFont, align: TextAlignment, color: NSUIColor, anchor: CGPoint, angleRadians: CGFloat)
     {
