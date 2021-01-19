@@ -667,6 +667,46 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
         }
     }
     
+    open func drawBar(context: CGContext, dataSet: IBarChartDataSet, index: Int, barRect: CGRect) {
+        context.saveGState()
+        defer { context.restoreGState() }
+
+        // Determine draw path for rounded bars if enabled
+        var roundedPath: CGPath?
+        if dataProvider?.isDrawRoundedBarEnabled == true {
+            var cornerRadius = CGSize(width: barRect.width / 2.0, height: barRect.width / 2.0)
+            if dataSet.barCornerRadius > 0.0 {
+                cornerRadius = .init(width: dataSet.barCornerRadius, height: dataSet.barCornerRadius)
+            }
+
+            #if os(OSX)
+            let bezierPath = NSBezierPath(roundedRect: barRect, xRadius: cornerRadius.width, yRadius: cornerRadius.height)
+            roundedPath = bezierPath.cgPath
+            #else
+            let bezierPath = UIBezierPath(roundedRect: barRect, byRoundingCorners: dataSet.barRoundingCorners, cornerRadii: cornerRadius)
+            roundedPath = bezierPath.cgPath
+            #endif
+        }
+
+        // Draw gradient or fill given presence of gradient colors
+        if let gradientColor = dataSet.barGradientColor(at: index) {
+            drawGradient(context: context, barRect: barRect, path: roundedPath, gradientColors: gradientColor, orientation: dataSet.barGradientOrientation)
+        }
+        else {
+            // Set the color for the currently drawn value. If the index is out of bounds, reuse colors.
+            let fillColor = dataSet.color(atIndex: index).cgColor
+            context.setFillColor(fillColor)
+
+            if let path = roundedPath {
+                context.addPath(path)
+                context.fillPath()
+            }
+            else {
+                context.fill(barRect)
+            }
+        }
+    }
+    
     /// Draws a value at the specified x and y position.
     @objc open func drawValue(context: CGContext, value: String, xPos: CGFloat, yPos: CGFloat, font: NSUIFont, align: TextAlignment, color: NSUIColor, anchor: CGPoint, angleRadians: CGFloat)
     {
