@@ -44,23 +44,28 @@ open class ZoomViewJob: ViewPortJob
     
     open override func doJob()
     {
-        var matrix = viewPortHandler.setZoom(scaleX: scaleX, scaleY: scaleY)
-        viewPortHandler.refresh(newMatrix: matrix, chart: view, invalidate: false)
+        if let v = view {
+
+        guard let handler = viewPortHandler else { return }
+        var matrix = handler.setZoom(scaleX: scaleX, scaleY: scaleY)
+        handler.refresh(newMatrix: matrix, chart: v, invalidate: false)
         
-        let yValsInView = (view as! BarLineChartViewBase).getAxis(axisDependency).axisRange / Double(viewPortHandler.scaleY)
-        let xValsInView = (view as! BarLineChartViewBase).xAxis.axisRange / Double(viewPortHandler.scaleX)
+        let yValsInView = (view as! BarLineChartViewBase).getAxis(axisDependency).axisRange / Double(handler.scaleY)
+        let xValsInView = (view as! BarLineChartViewBase).xAxis.axisRange / Double(handler.scaleX)
         
         var pt = CGPoint(
             x: CGFloat(xValue - xValsInView / 2.0),
             y: CGFloat(yValue + yValsInView / 2.0)
         )
         
-        transformer.pointValueToPixel(&pt)
+        transformer?.pointValueToPixel(&pt)
         
-        matrix = viewPortHandler.translate(pt: pt)
-        viewPortHandler.refresh(newMatrix: matrix, chart: view, invalidate: false)
+        matrix = handler.translate(pt: pt)
         
-        (view as! BarLineChartViewBase).calculateOffsets()
-        view.setNeedsDisplay()
+            handler.refresh(newMatrix: matrix, chart: v, invalidate: false)
+            
+            (v as! BarLineChartViewBase).calculateOffsets()
+            v.setNeedsDisplay()
+        }
     }
 }

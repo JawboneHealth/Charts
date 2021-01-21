@@ -21,7 +21,9 @@ open class AnimatedMoveViewJob: AnimatedViewPortJob
             y: yOrigin + (CGFloat(yValue) - yOrigin) * phase
         )
         
-        transformer.pointValueToPixel(&pt)
-        viewPortHandler.centerViewPort(pt: pt, chart: view)
+        transformer?.pointValueToPixel(&pt)
+        if let v = view {
+            viewPortHandler?.centerViewPort(pt: pt, chart: v)
+        }
     }
 }

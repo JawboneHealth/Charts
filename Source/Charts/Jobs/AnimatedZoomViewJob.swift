@@ -64,27 +64,31 @@ open class AnimatedZoomViewJob: AnimatedViewPortJob
     {
         let scaleX = xOrigin + (self.scaleX - xOrigin) * phase
         let scaleY = yOrigin + (self.scaleY - yOrigin) * phase
+                
+        guard let v = view else { return }
+        guard let handler = viewPortHandler else { return }
         
-        var matrix = viewPortHandler.setZoom(scaleX: scaleX, scaleY: scaleY)
-        viewPortHandler.refresh(newMatrix: matrix, chart: view, invalidate: false)
+        var matrix = handler.setZoom(scaleX: scaleX, scaleY: scaleY)
         
-        let valsInView = CGFloat(yAxis.axisRange) / viewPortHandler.scaleY
-        let xsInView = CGFloat(xAxisRange) / viewPortHandler.scaleX
+        handler.refresh(newMatrix: matrix, chart: v, invalidate: false)
+        
+        let valsInView = CGFloat(yAxis.axisRange) / handler.scaleY
+        let xsInView = CGFloat(xAxisRange) / handler.scaleX
         
         var pt = CGPoint(
             x: zoomOriginX + ((zoomCenterX - xsInView / 2.0) - zoomOriginX) * phase,
             y: zoomOriginY + ((zoomCenterY + valsInView / 2.0) - zoomOriginY) * phase
         )
         
-        transformer.pointValueToPixel(&pt)
+        transformer?.pointValueToPixel(&pt)
         
-        matrix = viewPortHandler.translate(pt: pt)
-        viewPortHandler.refresh(newMatrix: matrix, chart: view, invalidate: true)
+        matrix = handler.translate(pt: pt)
+        handler.refresh(newMatrix: matrix, chart: v, invalidate: true)
     }
     
     internal override func animationEnd()
     {
         (view as? BarLineChartViewBase)?.calculateOffsets()
-        view.setNeedsDisplay()
+        view?.setNeedsDisplay()
     }
 }
